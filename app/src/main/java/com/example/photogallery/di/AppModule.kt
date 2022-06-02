@@ -14,19 +14,25 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
-    single { createFlickrApi() }
+    single { createFlickrApi(createRetrofit(createClient())) }
     single { FlickrFetcher(get()) }
     viewModel { PhotoGalleryViewModel(androidApplication(), get()) }
 }
 
-private fun createFlickrApi(): FlickrApi {
-    val client = OkHttpClient.Builder()
-        .addInterceptor(PhotoInterceptor())
-        .build()
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.flickr.com/")
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    return retrofit.create(FlickrApi::class.java)
+private fun createFlickrApi(retrofit: Retrofit): FlickrApi {
+    return retrofit.create()
 }
+
+inline fun <reified T : Any> Retrofit.create(): T {
+    return create(T::class.java)
+}
+
+private fun createRetrofit(client: OkHttpClient) = Retrofit.Builder()
+    .baseUrl("https://api.flickr.com/")
+    .client(client)
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+private fun createClient() = OkHttpClient.Builder()
+    .addInterceptor(PhotoInterceptor())
+    .build()
