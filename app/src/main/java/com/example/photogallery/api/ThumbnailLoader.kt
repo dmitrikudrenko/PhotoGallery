@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 private const val TAG = "ThumbnailLoader"
 private const val MESSAGE_DOWNLOAD = 1
 
-class ThumbnailLoader<in T>(
+class ThumbnailLoader<in T : Any>(
     private val flickrFetcher: FlickrFetcher,
     private val responseHandler: Handler,
     private val onThumbnailDownloaded: (T, Bitmap) -> Unit
